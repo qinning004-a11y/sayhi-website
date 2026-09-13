@@ -60,7 +60,7 @@ export function App() {
   const [lang, setLang] = useState('zh');
   const [activeProduct, setActiveProduct] = useState(0);
   const [pose, setPose] = useState(0);
-  const artworks = [{ name: '哪吒', source: `${import.meta.env.BASE_URL}assets/ne-zha.glb?v=e00eb89e12` }, { name: '泛太岁', source: `${import.meta.env.BASE_URL}assets/taisui.glb` }, { name: '祢豆子', source: `${import.meta.env.BASE_URL}assets/anime.glb` }];
+  const artworks = [{ name: '哪吒', source: `${import.meta.env.BASE_URL}assets/ne-zha.glb?v=e00eb89e12` }, { name: '范太岁', source: `${import.meta.env.BASE_URL}assets/taisui.glb` }, { name: '祢豆子', source: `${import.meta.env.BASE_URL}assets/anime.glb` }];
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
