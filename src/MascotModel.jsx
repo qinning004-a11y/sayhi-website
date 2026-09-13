@@ -49,7 +49,7 @@ export default function MascotModel({ paused, source, name, lang }) {
     async function load() {
       if(started)return;started=true;
       try {
-        const response=await fetch(source,{signal:abort.signal});if(!response.ok)throw new Error('Model unavailable');
+        const response=await fetch(source,{signal:abort.signal,priority:'low'});if(!response.ok)throw new Error('Model unavailable');
         const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(await response.arrayBuffer(),'');
         if(disposed){disposeModel(gltf.scene);return;}
         model=gltf.scene;

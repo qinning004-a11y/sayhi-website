@@ -30,7 +30,7 @@ export default function ShowcaseReel({ lang, paused }) {
     return () => clearInterval(timer);
   }, [running]);
   return <section className="showcase-reel" data-running={running} ref={root} aria-roledescription={lang === 'zh' ? '轮播' : 'carousel'} aria-label={lang === 'zh' ? '作品视觉精选' : 'Selected visuals'}>
-    {works.map((work, i) => <div key={work.image} className={`reel-slide ${index === i ? 'is-active' : ''}`} aria-hidden={index !== i}><img src={`${import.meta.env.BASE_URL}assets/showcase/${work.image}`} alt="" loading="lazy"/><div className="reel-shade"/><div className="reel-copy"><span className="eyebrow">{work.subtitle}</span><h3>{work.title[language]}</h3><p>{work.line[language]}</p></div></div>)}
+    {works.map((work, i) => <div key={work.image} className={`reel-slide ${index === i ? 'is-active' : ''}`} aria-hidden={index !== i}><img src={`${import.meta.env.BASE_URL}assets/showcase/${work.image}`} alt="" loading="lazy" decoding="async" fetchPriority={index === i ? 'high' : 'low'}/><div className="reel-shade"/><div className="reel-copy"><span className="eyebrow">{work.subtitle}</span><h3>{work.title[language]}</h3><p>{work.line[language]}</p></div></div>)}
     <AmbientAtmosphere paused={!running}/>
     <div className="reel-atmosphere" aria-hidden="true"><i/><i/><i/></div>
     <div className="reel-top"><span>SELECTED WORLDS / 2026</span><span>{lang === 'zh' ? '作品视觉 · AI 艺术重构' : 'AI-REIMAGINED KEY VISUALS'}</span></div>
