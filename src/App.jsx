@@ -9,15 +9,15 @@ const MascotModel = lazy(() => import('./MascotModel.jsx'));
 const PortalEffects = lazy(() => import('./PortalEffects.jsx'));
 const sectionIds = ['world', 'products', 'universe'];
 const poseData = [
-  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-8.png`, x: 18, width: 505, height: 941, sheet: 1672 },
-  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-10.png`, x: 578, width: 606, height: 941, sheet: 1672 },
-  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-11.png`, x: 1110, width: 562, height: 941, sheet: 1672 },
+  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-8.webp`, x: 18, width: 505, height: 941, sheet: 1672 },
+  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-10.webp`, x: 578, width: 606, height: 941, sheet: 1672 },
+  { src: `${import.meta.env.BASE_URL}assets/mascot-poses-11.webp`, x: 1110, width: 562, height: 941, sheet: 1672 },
 ];
 
 function Mascot({ pose = 1, className = '' }) {
   const p = poseData[pose];
   return <span className={`mascot-crop ${className}`} style={{ aspectRatio: `${p.width}/${p.height}` }} aria-hidden="true">
-    <img src={p.src} draggable="false" alt="" style={{ width: `${p.sheet / p.width * 100}%`, left: `${-p.x / p.width * 100}%` }} />
+    <img src={p.src} fetchPriority="high" decoding="async" draggable="false" alt="" style={{ width: `${p.sheet / p.width * 100}%`, left: `${-p.x / p.width * 100}%` }} />
   </span>;
 }
 
@@ -60,7 +60,7 @@ export function App() {
   const [lang, setLang] = useState('zh');
   const [activeProduct, setActiveProduct] = useState(0);
   const [pose, setPose] = useState(0);
-  const artworks = [{ name: '哪吒', source: `${import.meta.env.BASE_URL}assets/ne-zha.glb?v=e00eb89e12` }, { name: '范太岁', source: `${import.meta.env.BASE_URL}assets/taisui.glb` }, { name: '祢豆子', source: `${import.meta.env.BASE_URL}assets/anime.glb` }];
+  const artworks = [{ name: '哪吒', source: `${import.meta.env.BASE_URL}assets/ne-zha-optimized.glb` }, { name: '范太岁', source: `${import.meta.env.BASE_URL}assets/taisui-optimized.glb` }, { name: '祢豆子', source: `${import.meta.env.BASE_URL}assets/anime-optimized.glb` }];
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');

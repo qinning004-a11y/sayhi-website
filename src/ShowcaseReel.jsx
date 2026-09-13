@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Pause, Play } from '@phosphor-icons/react';
 import AmbientAtmosphere from './AmbientAtmosphere.jsx';
 const works = [
-  { image: 'showcase-2.png', title: ['镇海太岁', 'Guardian of the Sea'], subtitle: 'FANTASY ADVENTURE', line: ['想象越过海面，故事奔向远方。', 'Beyond the waves. Beyond imagination.'] },
-  { image: 'showcase-0.png', title: ['甲骨天师', 'Oracle Masters'], subtitle: 'URBAN FANTASY', line: ['城市之下，另一个世界正在苏醒。', 'Another world awakens beneath the city.'] },
-  { image: 'showcase-1.png', title: ['夏枯雪', 'Kuso'], subtitle: 'CHARACTER PORTRAIT', line: ['一个眼神，便是一整个故事。', 'A whole story in a single glance.'] },
+  { image: 'showcase-2.webp', title: ['镇海太岁', 'Guardian of the Sea'], subtitle: 'FANTASY ADVENTURE', line: ['想象越过海面，故事奔向远方。', 'Beyond the waves. Beyond imagination.'] },
+  { image: 'showcase-0.webp', title: ['甲骨天师', 'Oracle Masters'], subtitle: 'URBAN FANTASY', line: ['城市之下，另一个世界正在苏醒。', 'Another world awakens beneath the city.'] },
+  { image: 'showcase-1.webp', title: ['夏枯雪', 'Kuso'], subtitle: 'CHARACTER PORTRAIT', line: ['一个眼神，便是一整个故事。', 'A whole story in a single glance.'] },
 ];
 export default function ShowcaseReel({ lang, paused }) {
   const [index, setIndex] = useState(0), [localPaused, setLocalPaused] = useState(false), [visible, setVisible] = useState(false), [pageVisible, setPageVisible] = useState(!document.hidden);

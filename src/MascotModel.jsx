@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export default function MascotModel({ paused, source, name, lang }) {
@@ -49,7 +50,7 @@ export default function MascotModel({ paused, source, name, lang }) {
       if(started)return;started=true;
       try {
         const response=await fetch(source,{signal:abort.signal});if(!response.ok)throw new Error('Model unavailable');
-        const gltf=await new GLTFLoader().parseAsync(await response.arrayBuffer(),'');
+        const gltf=await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).parseAsync(await response.arrayBuffer(),'');
         if(disposed){disposeModel(gltf.scene);return;}
         model=gltf.scene;
         const bounds=new THREE.Box3().setFromObject(model), center=bounds.getCenter(new THREE.Vector3());
