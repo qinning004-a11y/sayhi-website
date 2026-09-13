@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowDown, ArrowUp, ArrowRight, X, List, Pause, Play, Plus, Minus } from '@phosphor-icons/react';
+import { ArrowUpRight, ArrowDown, ArrowUp, ArrowRight, X, List, Plus, Minus } from '@phosphor-icons/react';
+import ShowcaseReel from './ShowcaseReel.jsx';
+import AmbientAtmosphere from './AmbientAtmosphere.jsx';
 import CreationJourney from './CreationJourney.jsx';
 import { copy, products } from './content.js';
 
@@ -58,13 +60,14 @@ export function App() {
   const [lang, setLang] = useState('zh');
   const [activeProduct, setActiveProduct] = useState(0);
   const [pose, setPose] = useState(0);
-  const artworks = [{ name: 'Ne Zha', source: `${import.meta.env.BASE_URL}assets/ne-zha.glb?v=e00eb89e12` }, { name: 'Taisui', source: `${import.meta.env.BASE_URL}assets/taisui.glb` }, { name: 'Anime', source: `${import.meta.env.BASE_URL}assets/anime.glb` }];
+  const artworks = [{ name: '哪吒', source: `${import.meta.env.BASE_URL}assets/ne-zha.glb?v=e00eb89e12` }, { name: '泛太岁', source: `${import.meta.env.BASE_URL}assets/taisui.glb` }, { name: '祢豆子', source: `${import.meta.env.BASE_URL}assets/anime.glb` }];
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [paused, setPaused] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [preview, setPreview] = useState(null);
   const hero = useRef(null);
+  const footer = useRef(null);
   const ipStage = useRef(null);
   const menuToggle = useRef(null);
   const c = copy[lang];
@@ -75,6 +78,12 @@ export function App() {
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
     document.title = lang === 'zh' ? '中文四海 Sayhi — 每一个故事，都是一个世界' : 'Sayhi & Co. — Every story. A whole new world.';
   }, [lang]);
+  useEffect(() => {
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => setPaused(preference.matches);
+    preference.addEventListener('change', sync);
+    return () => preference.removeEventListener('change', sync);
+  }, []);
   useEffect(() => { document.documentElement.dataset.motion = paused ? 'paused' : 'active'; }, [paused]);
   useEffect(() => {
     function onScroll() { setScrolled(window.scrollY > 40); }
@@ -98,6 +107,23 @@ export function App() {
     return () => query.removeEventListener('change', closeOnDesktop);
   }, []);
 
+  useEffect(() => {
+    let timer;
+    function transition(event) {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link || paused || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const target = document.getElementById(link.hash.slice(1));
+      if (!target) return;
+      document.documentElement.classList.remove('chapter-transition');
+      void document.documentElement.offsetWidth;
+      document.documentElement.classList.add('chapter-transition');
+      clearTimeout(timer);
+      timer = setTimeout(() => document.documentElement.classList.remove('chapter-transition'), 850);
+    }
+    document.addEventListener('click', transition);
+    return () => { document.removeEventListener('click', transition); clearTimeout(timer); document.documentElement.classList.remove('chapter-transition'); };
+  }, [paused]);
+
   function tilt(e, ref) {
     if(paused || e.pointerType === 'touch') return;
     const rect = ref.current.getBoundingClientRect();
@@ -118,16 +144,17 @@ export function App() {
       <div className="header-right"><div className="language-switch" aria-label="Language"><button className={lang === 'zh' ? 'selected' : ''} aria-pressed={lang === 'zh'} onClick={() => setLang('zh')}>中文</button><span>/</span><button className={lang === 'en' ? 'selected' : ''} aria-pressed={lang === 'en'} onClick={() => setLang('en')}>EN</button></div><button ref={menuToggle} className="icon-button menu-toggle" aria-label={menuOpen ? c.closeMenu : c.menu} aria-expanded={menuOpen} aria-controls="mobile-menu" onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? <X size={24}/> : <List size={24}/>}</button></div>
     </header>
     {menuOpen && <nav className="mobile-menu" id="mobile-menu" aria-label={c.menu}>{c.nav.map((label, i) => <a key={sectionIds[i]} href={`#${sectionIds[i]}`} onClick={() => setMenuOpen(false)}><span>0{i + 1}</span>{label}<ArrowUpRight size={25}/></a>)}</nav>}
+    <div className="chapter-wipe" aria-hidden="true"/>
     <main>
       <section id="home" className="hero" ref={hero} onPointerMove={e => tilt(e, hero)} onPointerLeave={() => resetTilt(hero)}>
-        <div className="hero-background" aria-hidden="true"/>
+        <div className="hero-background" aria-hidden="true"/><AmbientAtmosphere paused={paused}/>
         <Suspense fallback={null}><PortalEffects paused={paused} variant="hero"/></Suspense>
         <div className="hero-copy"><p className="eyebrow hero-kicker">SAYHI & CO. / CHINESE CREATIVITY, GLOBAL STORIES</p><h1>{c.hero.map(line => <span key={line}>{line}</span>)}</h1><p className="hero-intro">{c.intro}</p><a href="#world" className="pill-button">{c.explore}<ArrowUpRight size={25} weight="bold"/></a></div>
         <div className="hero-character"><Mascot pose={1}/></div>
         <div className="hero-side-note"><span>{c.side}</span><span className="short-rule"/></div>
         <div className="hero-bottom"><div className="chapter-links">{products.map((p, index) => <a key={p.id} href="#products" className={activeProduct === index ? 'selected' : ''} onClick={() => setActiveProduct(index)}><span className="chapter-number">{p.number}</span><span>{p[lang].label}<small>{p.word}</small></span></a>)}</div><a className="scroll-hint" href="#world"><span>BEYOND THE FRAME</span><ArrowDown size={18}/></a></div>
       </section>
-      <section id="world" className="world-section section-pad">
+      <section id="world" className="world-section section-pad paper-scene"><AmbientAtmosphere paused={paused} tone="paper"/>
         <div className="section-topline reveal"><span className="eyebrow">01 / {c.aboutLabel}</span><span className="micro">IDEAS BECOME WORLDS.</span></div>
         <div className="world-grid"><h2 className="world-title reveal">{c.aboutTitle.map((line, i) => <span key={line} className={i === 1 ? 'muted' : ''}>{line}</span>)}</h2><div className="world-description reveal"><p>{c.aboutText}</p><a href="#products" className="text-button">{c.productLabel}<ArrowDown size={20}/></a></div></div>
         <div className="story-line reveal">{products.map((p, i) => <div key={p.id}><span className="micro">{p.number} / {p[lang].label}</span><strong>{p.word}</strong>{i < 2 && <ArrowRight className="journey-arrow" size={28} weight="thin"/>}</div>)}</div>
@@ -141,11 +168,12 @@ export function App() {
           <div className="product-copy" key={product.id}><span className="eyebrow">{text.tag}</span><h3>{text.title}</h3><p>{text.description}</p><span className="product-format">{text.format}</span><button className="text-button" onClick={() => setPreview(product)}>{c.preview}<ArrowUpRight size={21}/></button></div>
         </div>
       </section>
+      <ShowcaseReel lang={lang} paused={paused}/>
       <CreationJourney lang={lang} paused={paused}/>
-      <section id="universe" className="ip-section section-pad"><div className="section-topline reveal"><span className="eyebrow">04 / {c.ipLabel}</span><span className="micro">CHARACTERS WITH CHARACTER.</span></div><div className="ip-grid"><div className="ip-copy reveal"><h2>{c.ipTitle.map(line => <span key={line}>{line}</span>)}</h2><p>{c.ipText}</p><div className="pose-buttons" aria-label={lang === 'zh' ? '模型作品' : 'Model artworks'}>{artworks.map(({ name: label }, i) => <button key={label} aria-pressed={pose === i} onClick={() => { setPose(i); }}><span>0{i + 1}</span>{label}</button>)}</div><small className="ip-caption">{lang === 'zh' ? '3D 作品展示 · 选择作品，自由探索' : '3D COLLECTION · SELECT & EXPLORE'}</small></div><div className="ip-stage" ref={ipStage}><span className="ip-watermark" aria-hidden="true">HI.</span><Suspense fallback={<div className="model-loading">Loading…</div>}><MascotModel key={artworks[pose].source} paused={paused} source={artworks[pose].source} name={artworks[pose].name} lang={lang}/></Suspense><div className="ip-stage-bottom"><span className="micro">{c.ipHint}</span><span className="micro">{artworks[pose].name} · 0{pose + 1} / 03</span></div></div></div></section>
-      <footer className="site-footer section-pad"><div className="footer-top"><span className="eyebrow">{c.footerLabel}</span><span className="micro">THE NEXT CHAPTER IS YOURS.</span></div><a href="#home" className="footer-title" aria-label={c.back}><span>{c.footerTitle[0]}<br/><b>{c.footerTitle[1]}</b></span><span className="footer-arrow"><ArrowUpRight weight="thin"/></span></a><div className="footer-bottom"><Brand/><span>© {new Date().getFullYear()} SAYHI & CO.</span><span>{c.footerNote}</span><a href="#home" className="back-top" aria-label={c.back}><ArrowUp size={20}/></a></div></footer>
+      <section id="universe" className="ip-section section-pad"><div className="section-topline reveal"><span className="eyebrow">04 / {c.ipLabel}</span><span className="micro">CHARACTERS WITH CHARACTER.</span></div><div className="ip-grid"><div className="ip-copy reveal"><h2>{c.ipTitle.map(line => <span key={line}>{line}</span>)}</h2><p>{c.ipText}</p><div className="pose-buttons" aria-label={lang === 'zh' ? '模型作品' : 'Model artworks'}>{artworks.map(({ name: label }, i) => <button key={label} aria-pressed={pose === i} onClick={() => { setPose(i); }}><span>0{i + 1}</span>{label}</button>)}</div><small className="ip-caption">{lang === 'zh' ? '3D 作品展示 · 选择作品，自由探索' : '3D COLLECTION · SELECT & EXPLORE'}</small></div><div className="ip-stage" ref={ipStage}><AmbientAtmosphere paused={paused} tone="cool"/><span className="ip-watermark" aria-hidden="true">HI.</span><Suspense fallback={<div className="model-loading">Loading…</div>}><MascotModel key={artworks[pose].source} paused={paused} source={artworks[pose].source} name={artworks[pose].name} lang={lang}/></Suspense><div className="ip-stage-bottom"><span className="micro">{c.ipHint}</span><span className="micro">{artworks[pose].name} · 0{pose + 1} / 03</span></div></div></div></section>
+      <footer id="contact" ref={footer} className="site-footer section-pad" onPointerMove={e => tilt(e, footer)} onPointerLeave={() => resetTilt(footer)}><AmbientAtmosphere paused={paused} tone="footer"/><div className="footer-top"><span className="eyebrow">{c.footerLabel}</span><span className="micro">THE NEXT CHAPTER IS YOURS.</span></div><a href="#home" className="footer-title" aria-label={c.back}><span className="footer-lettering">{c.footerTitle[0]}<br/><b>{c.footerTitle[1]}</b></span><span className="footer-arrow"><ArrowUpRight weight="thin"/></span></a><div className="footer-bottom"><Brand/><span>© {new Date().getFullYear()} SAYHI & CO.</span><span>{c.footerNote}</span><a href="#home" className="back-top" aria-label={c.back}><ArrowUp size={20}/></a></div></footer>
     </main>
-    <button className="motion-control" aria-label={paused ? c.resume : c.pause} aria-pressed={paused} title={paused ? c.resume : c.pause} onClick={() => setPaused(!paused)}>{paused ? <Play size={16} weight="fill"/> : <Pause size={16} weight="fill"/>}<span>{paused ? 'PLAY' : 'PAUSE'}</span></button>
+
     {preview && <Preview product={preview} lang={lang} onClose={() => setPreview(null)}/>}
   </>;
 }

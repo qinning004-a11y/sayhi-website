@@ -1,3 +1,4 @@
+import AmbientAtmosphere from './AmbientAtmosphere.jsx';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ArrowRight, Play } from '@phosphor-icons/react';
 const MascotModel = lazy(() => import('./MascotModel.jsx'));
@@ -22,7 +23,7 @@ const content = {
   },
 };
 export default function CreationJourney({ lang, paused }) {
-  const [step,setStep]=useState(3),[playing,setPlaying]=useState(false);
+  const [step,setStep]=useState(0),[playing,setPlaying]=useState(false);
   const video=useRef(null), c=content[lang];
   useEffect(()=>{
     setPlaying(false);
@@ -33,13 +34,13 @@ export default function CreationJourney({ lang, paused }) {
   useEffect(()=>{if(paused)video.current?.pause();},[paused]);
   function select(index){video.current?.pause();setStep(index);}
   function keys(e,index){const next=e.key==='ArrowRight'?(index+1)%4:e.key==='ArrowLeft'?(index+3)%4:e.key==='Home'?0:e.key==='End'?3:null;if(next!==null){e.preventDefault();select(next);document.getElementById(`creation-tab-${next}`)?.focus();}}
-  return <section className="creation-section section-pad" id="technology">
+  return <section className="creation-section section-pad paper-scene" id="technology"><AmbientAtmosphere paused={paused} tone="paper"/>
     <div className="section-topline"><span className="eyebrow">{c.kicker}</span><span className="micro">FROM A SPARK TO THE SCREEN</span></div>
     <div className="creation-heading"><h2>{c.title[0]}<span>{c.title[1]}</span></h2><p>{c.intro}</p></div>
     <div className="creation-steps" role="tablist" aria-label={lang==='zh'?'创作流程':'Creation process'}>{c.steps.map((label,i)=><button key={label} id={`creation-tab-${i}`} role="tab" aria-selected={step===i} aria-controls="creation-panel" tabIndex={step===i?0:-1} onClick={()=>select(i)} onKeyDown={e=>keys(e,i)}><span>0{i+1}</span><strong>{label}</strong><ArrowRight size={18}/></button>)}</div>
     <div className={`creation-panel creation-step-${step}`} id="creation-panel" role="tabpanel" aria-labelledby={`creation-tab-${step}`}>
       <div className="creation-editorial"><div className="creation-index">0{step+1}<span>/ 04</span></div><span className="eyebrow">{c.tags[step]}</span><h3>{c.titles[step]}</h3><p>{c.descriptions[step]}</p><div className="creation-project"><span>TAISUI</span><small>{step===3?c.caption:c.steps[step]}</small></div>{step<3&&<button className="text-button" onClick={()=>select(step+1)}>{c.next}<ArrowUpRight size={19}/></button>}</div>
-      <div className="creation-media">
+      <div className="creation-media" key={step}>
         {step===0&&<div className="story-treatment"><span className="eyebrow">{c.brief}</span><p>{c.story}</p><span className="story-rule"/><small>SCENE 01 / NIGHT / WATER</small></div>}
         {step===1&&<figure className="character-sheet"><img src={`${import.meta.env.BASE_URL}assets/creation/character-views.png`} width="1536" height="1024" alt={lang==='zh'?'银发男主正面、侧面和背面设定图':'Silver-haired character turnaround'} loading="lazy"/><figcaption>CHARACTER STUDY / 001</figcaption></figure>}
         {step===2&&<div className="creation-model"><Suspense fallback={<span className="model-loading">Loading…</span>}><MascotModel source={`${import.meta.env.BASE_URL}assets/taisui.glb`} name="Taisui" paused={paused} lang={lang}/></Suspense><span className="creation-model-hint">{lang==='zh'?'拖拽旋转 · 滚轮缩放':'DRAG TO ROTATE · SCROLL TO ZOOM'}</span></div>}
